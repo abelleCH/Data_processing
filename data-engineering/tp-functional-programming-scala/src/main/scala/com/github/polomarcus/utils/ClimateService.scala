@@ -73,9 +73,28 @@ object ClimateService {
     }
   }
 
+  def estimateCO2For2050(co2Records: List[CO2Record]): Double = {
+    // Calculate the mean of years and CO2 ppm values
+    val meanYear = co2Records.map(_.year).sum.toDouble / co2Records.length
+    val meanPPM = co2Records.map(_.ppm).sum / co2Records.length
+
+    // Calculate the slope (m) and intercept (b) of the linear regression line
+    val numerator = co2Records.map(record => (record.year - meanYear) * (record.ppm - meanPPM)).sum
+    val denominator = co2Records.map(record => math.pow(record.year - meanYear, 2)).sum
+    val slope = numerator / denominator
+    val intercept = meanPPM - slope * meanYear
+
+    // Estimate CO2 level for 2050 using the linear regression equation (y = mx + b)
+    val year2050 = 2050
+    val co2EstimationFor2050 = slope * year2050 + intercept
+    co2EstimationFor2050
+  }
 
 
-  /**
+
+
+
+/**
    * use this function side src/main/scala/com/polomarcus/main/Main (with sbt run)
    * display every item on the list using the CO2Record's "show" function
    *
@@ -96,7 +115,6 @@ object ClimateService {
     val noneCount = list.count(_.isEmpty)
     logger.info(s"Number of None values : $noneCount")
   }
-
 
   /**
    * CO2 record from 1958 to 2022
