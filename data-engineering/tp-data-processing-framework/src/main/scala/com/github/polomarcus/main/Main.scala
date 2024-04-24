@@ -63,11 +63,24 @@ object Main {
 
     // Use strongly typed dataset to be sure to not introduce a typo to your SQL Query
     // Tips : https://stackoverflow.com/a/46514327/3535853
+    enrichedDataset.filter("false").map(_.containsWordGlobalWarming)         // using typed APIs
+    val fildata: Dataset[News] = enrichedDataset.filter(false).as[News]
+    val containsWordGlobalWarming: Dataset[Boolean] = fildata.map(_.containsWordGlobalWarming)
 
 
     // Save it as a columnar format with Parquet with a partition by date and media
     // Learn about Parquet : https://spark.apache.org/docs/3.2.1/sql-data-sources-parquet.html
     // Learn about partition : https://spark.apache.org/docs/3.2.1/sql-data-sources-load-save-functions.html#bucketing-sorting-and-partitioning
+
+    // Define the path where Parquet files will be saved
+    //  val outputPath = "path_to_save_parquet_files"
+
+    // Save DataFrame as Parquet files with partitioning by date and media
+    // enrichedDataset
+    //   .write
+    //   .partitionBy("date", "media")
+    //   .parquet(outputPath)
+
 
     logger.info("Stopping the app")
     System.exit(0)
