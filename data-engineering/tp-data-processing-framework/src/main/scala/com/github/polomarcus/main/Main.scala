@@ -46,11 +46,20 @@ object Main {
 
     // Show how many news we have talking about climate change compare to others news (not related climate)
     // Tips: use a groupBy
-  //filteredNewsAboutClimate.groupBy()
 
+    val a=enrichedDataset.groupBy("containsWordGlobalWarming")
+    a.count().show()
+
+    // afficher les news qui ont le mot climat dans leur description
+    val filtered = filteredNewsAboutClimate.filter($"description".contains("climat"))
+    val climateGrouped = filtered.groupBy("description")
+    val counts = climateGrouped.count()
+    counts.show()
 
     // Use SQL to query a "news" table - look at : https://spark.apache.org/docs/latest/sql-getting-started.html#running-sql-queries-programmatically
-
+    enrichedDataset.createOrReplaceTempView("news")
+    val queryResult = spark.sql("SELECT containsWordGlobalWarming, COUNT(*) FROM news GROUP BY containsWordGlobalWarming")
+    queryResult.show()
 
     // Use strongly typed dataset to be sure to not introduce a typo to your SQL Query
     // Tips : https://stackoverflow.com/a/46514327/3535853
