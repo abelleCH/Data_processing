@@ -39,7 +39,12 @@ Using Conduktor, connect to **your existing docker kafka cluster** with `localho
 
 Questions:
 * [ ] When should we use a key when producing a message into Kafka ? What are the risks ? [Help](https://stackoverflow.com/a/61912094/3535853)
+
+To ensure that messages with the same key are always sent to the same partition.
+
 * [ ] How does the default partitioner (sticky partition) work with kafka ? [Help1](https://www.confluent.io/fr-fr/blog/apache-kafka-producer-improvements-sticky-partitioner/) and [Help2](https://www.conduktor.io/kafka/producer-default-partitioner-and-sticky-partitioner#Sticky-Partitioner-(Kafka-%E2%89%A5-2.4)-3)
+
+Distribute messages across partitions. Partitioned by the message type.
 
 #### Command CLI
 1. Connect to your kafka cluster with 2 command-line-interface (CLI)
@@ -65,17 +70,28 @@ Pay attention to the `KAFKA_ADVERTISED_LISTENERS` config from the docker-compose
 4. Keep reading events from a topic from one terminal : https://kafka.apache.org/documentation/#quickstart_consume
 * try the default config
 * what does the `--from-beginning` config do ? What happens when you do not use `--from-beginning` and instead the config `--group` such as --group?
+
+When using the --group option instead of --from-beginning, it signifies that you're consuming messages as part of a consumer group. Kafka maintains the offset for each consumer group, so if you restart a consumer within the same group without specifying --from-beginning, it will resume from where it left off.
+
+
 * Keep reading the message in your terminal and using Conduktor, can you notice something in the **Consumers tab** ? 
+Can see the consumer group consuming messages from the "mailbox" topic. As messages are consumed, we can see them displayed in real-time.
+
 * Now, in your terminal stop your consumer, notice the **lag** inside the **Consumer tab** on Conduktor, it should be **0**
 * With a producer, send message to the same topic, and look at the value of **lag**, what's happening ?
+Lag increase
+
 * Restart your consumer with the same consumer group, what's happening ?
+it resumes message consumption from where it left off
+
 * Trick question : What about using the `--group` option for your producer ?
+The --group option is used for consumers to specify the consumer group they belong to.
 
 #### Partition - consumer group / bookmark
 1. Check consumer group with `kafka-console-consumer` : https://kafka.apache.org/documentation/#basic_ops_consumer_group
 * notice if there is [lag](https://univalence.io/blog/articles/kafka-et-les-groupes-de-consommateurs/) for your group
-2. read from a new group, what happened ?
-3. read from an already existing group, what happened ?
+2. read from a new group, what happened ? It will start consuming messages from the beginning of the topic.
+3. read from an already existing group, what happened ? It will continue consumption from where the group left off
 4. Recheck consumer group using `kafka-console-consumer`
 
 #### Replication - High Availability
