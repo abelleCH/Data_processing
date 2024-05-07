@@ -44,7 +44,7 @@ To ensure that messages with the same key are always sent to the same partition.
 
 * [ ] How does the default partitioner (sticky partition) work with kafka ? [Help1](https://www.confluent.io/fr-fr/blog/apache-kafka-producer-improvements-sticky-partitioner/) and [Help2](https://www.conduktor.io/kafka/producer-default-partitioner-and-sticky-partitioner#Sticky-Partitioner-(Kafka-%E2%89%A5-2.4)-3)
 
-Distribute messages across partitions. Partitioned by the message type.
+Distribute messages across partitions. Partitioned randomly
 
 #### Command CLI
 1. Connect to your kafka cluster with 2 command-line-interface (CLI)
@@ -71,7 +71,7 @@ Pay attention to the `KAFKA_ADVERTISED_LISTENERS` config from the docker-compose
 * try the default config
 * what does the `--from-beginning` config do ? What happens when you do not use `--from-beginning` and instead the config `--group` such as --group?
 
-When using the --group option instead of --from-beginning, it signifies that you're consuming messages as part of a consumer group. Kafka maintains the offset for each consumer group, so if you restart a consumer within the same group without specifying --from-beginning, it will resume from where it left off.
+When using the --group option instead of --from-beginning, it signifies that you're consuming messages as part of a consumer group. Kafka maintains the offset for each consumer group, so if you restart a consumer within the same group without specifying --from-beginning, it will resume from where it left off. if we don't belong to a group, it creates on by default
 
 
 * Keep reading the message in your terminal and using Conduktor, can you notice something in the **Consumers tab** ? 
@@ -101,8 +101,17 @@ The --group option is used for consumers to specify the consumer group they belo
 * `kafka-topics --create --replication-factor 3 --partitions 2 --topic testreplicated --bootstrap-server localhost:19092`
 2. Describe your topic, notice where the different partitions are replicated and where are the leaders
 * `kafka-topics --describe --topic testreplicated --bootstrap-server localhost:19092`
+
+The leaders are given randomly and one partition is associated with one leader
+
 3. now, stop one of your brokers with docker : `docker stop your_container`
 4. Describe your topic, check and notice the difference with the ISR (in-sync replica) config : https://kafka.apache.org/documentation/#design_ha
+
+There's one less container 
+
 5. Restart your stopped broker:  `docker start your_container`
-6. Check again your topic
+6. Check again your topic 
+
+The 3 congtainers are there
+
 7. Bonus: you can do this operation while keeping producing message to this kafka topic with your command line
